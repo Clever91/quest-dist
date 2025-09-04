@@ -1,0 +1,65 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    # Option 1: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        publish_branch: gh-pages
+        
+    # Option 2: Deploy to Vercel (uncomment and configure if using Vercel)
+    # - name: Deploy to Vercel
+    #   uses: amondnet/vercel-action@v25
+    #   with:
+    #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+    #     vercel-org-id: ${{ secrets.ORG_ID }}
+    #     vercel-project-id: ${{ secrets.PROJECT_ID }}
+    #     working-directory: ./
+        
+    # Option 3: Deploy to Netlify (uncomment and configure if using Netlify)
+    # - name: Deploy to Netlify
+    #   uses: nwtgck/actions-netlify@v2.0
+    #   with:
+    #     publish-dir: './'
+    #     production-branch: main
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     deploy-message: "Deploy from GitHub Actions"
+    #     enable-pull-request-comment: false
+    #     enable-commit-comment: true
+    #     overwrites-pull-request-comment: true
+        
+    # Option 4: Deploy to custom server via SSH (uncomment and configure if using your own server)
+    # - name: Deploy to Production Server
+    #   uses: appleboy/ssh-action@v1.0.3
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.SSH_KEY }}
+    #     port: ${{ secrets.PORT }}
+    #     script: |
+    #       cd /path/to/your/production/directory
+    #       git pull origin main
+    #       # Add any build steps if needed
+    #       # npm run build
+    #       # Restart services if needed
+    #       # sudo systemctl restart nginx 
